@@ -6,7 +6,7 @@ public class scrFalcon : MonoBehaviour {
     float rotation = 90;
     const float DEFAULT_SPEED_X = 3;
     Rigidbody2D rb;
-    Vector2 artificialGravity = new Vector2(0, -5);
+    Vector2 artificialGravity = new Vector2(0, -8);
     float ascensionPoints = 0f;
     const float ASCENSION_PTS_MAX = 100;
     const float ASCENSION_PTS_MIN = 0;
@@ -48,9 +48,9 @@ public class scrFalcon : MonoBehaviour {
         }
         else if (rotation == 140)
         {
-            ascensionPoints -= ascension;
+            ascensionPoints -= 2 * ascension;
             if (ascensionPoints > ASCENSION_PTS_MIN)
-                totalForce += new Vector2(-10, 30);
+                totalForce += new Vector2(-25, 80);
             else
                 ascensionPoints = ASCENSION_PTS_MIN;
         }
@@ -59,7 +59,7 @@ public class scrFalcon : MonoBehaviour {
         //Total Force
         totalForce += artificialGravity;
         rb.AddForce(totalForce * .5f);
-        float maxRise = 30;
+        float maxRise = 80;
         float maxFall = -4;
         if (ascension < 0)
             maxFall += ascension;
