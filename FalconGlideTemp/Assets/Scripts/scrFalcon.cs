@@ -21,22 +21,20 @@ public class scrFalcon : MonoBehaviour {
         if (Input.GetKey("down")) {
             gravityModifier = new Vector2(5, -5);
             ascensionPoints += .1f + ascensionPoints;
-            if (ascensionPoints > 500)
-                ascensionPoints = 500;
+            if (ascensionPoints > 300)
+                ascensionPoints = 300;
         }
         //if you are not holding down, your falcon's wings are spread.
         //Decrease gravity, add your ascensionPoints to the y velocity (to have your falcon rise),
         //and clear ascensionPoints
         else {
-            gravityModifier = new Vector2(0, 5 + ascensionPoints);
+            gravityModifier = new Vector2(0, 7 + ascensionPoints*3);
             Debug.Log(ascensionPoints);
             ascensionPoints = 0;
         }
 
         //Total Force
-        Vector2 totalForce = new Vector2(0, 0);
-        totalForce += gravityModifier + artificialGravity;
-        rb.AddForce(totalForce);
+        rb.AddForce(artificialGravity + gravityModifier);
 
     }
 }
