@@ -5,7 +5,7 @@ public class scrFalcon : MonoBehaviour {
 
     const float DEFAULT_SPEED_X = 3;
     public float downButtonMultiplier = 5;
-    public float releaseDownMultiplier = 60;
+    public float releaseDownMultiplier = 90;
     public float glidingMultiplier = 7;
     Rigidbody2D rb;
     Vector2 artificialGravity = new Vector2(0, -8);
@@ -27,7 +27,8 @@ public class scrFalcon : MonoBehaviour {
         //if you release down, add a multiple of your current downward velocity to your velocity
         else if (Input.GetKeyUp("down"))
         {
-            gravityModifier = new Vector2(0, Mathf.Abs(rb.velocity.y) * releaseDownMultiplier);
+            if (rb.velocity.y < -5)
+                gravityModifier = new Vector2(0, Mathf.Abs(rb.velocity.y) * releaseDownMultiplier);
         }
         //if you are not holding down, your falcon's wings are spread.
         //Decrease gravity, 
