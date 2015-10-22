@@ -9,6 +9,7 @@ public class scrFalcon : MonoBehaviour {
     public string keyForMovement = "down";
     public float glidingMultiplier = 7f;
     public float releaseDownTimerMax = .5f;
+    public float delayBeforeImpulseUp = .2f;
     float releaseDownTimer = 0;
     Rigidbody2D rb;
 	Animator anim;
@@ -37,8 +38,7 @@ public class scrFalcon : MonoBehaviour {
         //if you release down, add a multiple of your current downward velocity to your velocity
         else if (Input.GetKeyUp(keyForMovement)) {
 			if (releaseDownTimer < 0 && rb.velocity.y < 0)   {
-           		rb.AddForce(impulseMultiplier * Mathf.Abs(rb.velocity.y), ForceMode2D.Impulse);
-           		releaseDownTimer = releaseDownTimerMax;
+                StartCoroutine(addForceUpwards());
 			}
 			anim.SetBool("isDiving", false);
         }
@@ -51,5 +51,12 @@ public class scrFalcon : MonoBehaviour {
         //Total Force
         rb.AddForce(artificialGravity + gravityModifier);
 
+    }
+
+    IEnumerator addForceUpwards()
+    {
+        yield return new WaitForSeconds(delayBeforeImpulseUp);
+        rb.AddForce(impulseMultiplier * Mathf.Abs(rb.velocity.y), ForceMode2D.Impulse);
+        releaseDownTimer = releaseDownTimerMax;
     }
 }
