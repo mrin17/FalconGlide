@@ -39,6 +39,7 @@ public class scrFalcon : MonoBehaviour {
         {
             gravityModifier = new Vector2(0, glidingMultiplier);
         }
+        //Debug.Log(ascensionPoints);
 
         //Total Force
         rb.AddForce(artificialGravity + gravityModifier);
