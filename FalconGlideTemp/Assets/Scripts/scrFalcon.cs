@@ -3,10 +3,10 @@ using System.Collections;
 
 public class scrFalcon : MonoBehaviour {
 
-    const float DEFAULT_SPEED_X = 3;
+    public float defaultSpeedX = 3;
     public float downButtonMultiplier = 5;
-    public float releaseDownMultiplier = 90;
-    public float glidingMultiplier = 7;
+    public float impulseModifier = 1.25f;
+    public float glidingMultiplier = 7f;
     Rigidbody2D rb;
     Vector2 artificialGravity = new Vector2(0, -8);
     Vector2 gravityModifier = new Vector2(0, 0);
@@ -15,7 +15,8 @@ public class scrFalcon : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody2D>();
-        transform.Translate(5, 0, 0);
+        transform.Translate(new Vector2(5, 0));
+        rb.AddForce(new Vector2(defaultSpeedX, 0));
 	}
 
     // Update is called once per frame
@@ -28,7 +29,8 @@ public class scrFalcon : MonoBehaviour {
         else if (Input.GetKeyUp("down"))
         {
             if (rb.velocity.y < -5)
-                gravityModifier = new Vector2(0, Mathf.Abs(rb.velocity.y) * releaseDownMultiplier);
+                rb.AddForce(new Vector2(0, Mathf.Abs(rb.velocity.y) * impulseModifier), ForceMode2D.Impulse);
+           
         }
         //if you are not holding down, your falcon's wings are spread.
         //Decrease gravity, 
