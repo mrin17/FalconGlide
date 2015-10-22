@@ -5,7 +5,8 @@ public class scrFalcon : MonoBehaviour {
 
     public float defaultSpeedX = 3;
     public Vector2 downButtonMultiplier = new Vector2(0, -5);
-    public Vector2 impulseMultiplier = new Vector2(.01f, 1.3f);
+    public Vector2 impulseMultiplier = new Vector2(.05f, 1.3f);
+    public string keyForMovement = "down";
     public float glidingMultiplier = 7f;
     public float releaseDownTimerMax = .5f;
     float releaseDownTimer = 0;
@@ -25,11 +26,11 @@ public class scrFalcon : MonoBehaviour {
     void Update() {
         releaseDownTimer -= Time.deltaTime;
         //If you hold down, your falcon dives. Increase gravity and horizontal velocity.
-        if (Input.GetKey("down")) {
+        if (Input.GetKey(keyForMovement)) {
             gravityModifier = downButtonMultiplier;
         }
         //if you release down, add a multiple of your current downward velocity to your velocity
-        else if (Input.GetKeyUp("down") && releaseDownTimer < 0 && rb.velocity.y < 0)
+        else if (Input.GetKeyUp(keyForMovement) && releaseDownTimer < 0 && rb.velocity.y < 0)
         {
             rb.AddForce(impulseMultiplier * Mathf.Abs(rb.velocity.y), ForceMode2D.Impulse);
             releaseDownTimer = releaseDownTimerMax;
