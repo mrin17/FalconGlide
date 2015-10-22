@@ -54,7 +54,7 @@ public class scrFalcon : MonoBehaviour {
             else
                 ascensionPoints = ASCENSION_PTS_MIN;
         }
-        Debug.Log(ascensionPoints);
+        //Debug.Log(ascensionPoints);
 
         //Total Force
         totalForce += artificialGravity;
