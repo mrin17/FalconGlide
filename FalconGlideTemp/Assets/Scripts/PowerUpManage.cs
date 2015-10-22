@@ -14,7 +14,7 @@ public class PowerUpManage : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			if (currentHeldPowerup == 1) {
 				currentHeldPowerup = -1; //Clear out inventory and set to empty
-				Instantiate(PoopProjectile);
+				Instantiate(PoopProjectile, transform.position, transform.rotation);
 			}
 		}
 	}
