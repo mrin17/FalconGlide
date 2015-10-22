@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class scrCamFollow : MonoBehaviour {
 
@@ -16,21 +17,17 @@ public class scrCamFollow : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (maxAddSpeed > 0)
-            maxAddSpeed -= .001f;
-        else
-            maxAddSpeed = 0;
-        for (int i = 0; i < falcons.Count; i++)
-        {
-            if (falcons[i].transform.position.x > transform.position.x + orthoProj)
-            {
-                float vel = falcons[i].GetComponent<Rigidbody2D>().velocity.x / 30;
-                if (vel > maxAddSpeed)
-                {
-                    maxAddSpeed = vel;
-                }
-            }
-        }
-        transform.Translate(new Vector3(SPEED + maxAddSpeed, 0, 0));
+
+		if (falcons.Where 
+		    (f => f.transform.position.x > transform.position.x + orthoProj).Any ()) {
+
+			maxAddSpeed += .001f;
+			transform.Translate (new Vector3 (SPEED + maxAddSpeed, 0, 0));	
+		}
+
+		else {
+			maxAddSpeed = maxAddSpeed > 0 ? maxAddSpeed - .001f : 0;
+			transform.Translate (new Vector3 (SPEED, 0, 0));	
+		}
     }
 }
