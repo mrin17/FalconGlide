@@ -3,7 +3,7 @@ using System.Collections;
 
 public class scrFalcon : MonoBehaviour {
 
-    public float defaultSpeedX = 3;
+    public float defaultSpeedX = 25;
     public Vector2 downButtonMultiplier = new Vector2(0, -5);
     public Vector2 impulseMultiplier = new Vector2(.05f, 1.3f);
     public string keyForMovement = "down";
