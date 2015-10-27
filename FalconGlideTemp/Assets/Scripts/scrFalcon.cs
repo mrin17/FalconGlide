@@ -3,9 +3,10 @@ using System.Collections;
 
 public class scrFalcon : MonoBehaviour {
 
+	public Collider2D otherFalcon;
     public float defaultSpeedX = 25;
     public Vector2 downButtonMultiplier = new Vector2(0, -5);
-    public Vector2 impulseMultiplier = new Vector2(.05f, 1.3f);
+    public Vector2 impulseMultiplier = new Vector2(.2f, 1.3f);
     public string keyForMovement = "down";
     public float glidingMultiplier = 7f;
     public float releaseDownTimerMax = .5f;
@@ -23,6 +24,7 @@ public class scrFalcon : MonoBehaviour {
         transform.Translate(new Vector2(7, 0));
         rb.AddForce(new Vector2(defaultSpeedX, 0));
 		anim = GetComponent<Animator> ();
+		Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherFalcon);
 	}
 
     // Update is called once per frame
