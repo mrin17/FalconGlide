@@ -6,15 +6,15 @@ public class UserInputFalcon : MonoBehaviour {
     public float gravity = -4;
     public string keyForMovement = "down";
     public float maxAngle = 60;
-    public float downRotationSpeed = 1;
-    public float upRotationSpeed = .7f;
+    public float downRotationSpeed = 3;
+    public float upRotationSpeed = 1;
     public float initUpRotationSpeed = 4;
-    public float movementSpeed = 10;
-    public float swoopYNegateMultiplier = -.5f;
+    public float movementSpeed = 15;
+    public float swoopYNegateMultiplier = -.7f;
     public float maxSpeedX = 20;
     public float minSpeedX = 5;
-    public float maxSpeedY = 15;
-    public float ascendInitVerticalMultiplier = 3;
+    public float ascendInitVerticalMultiplier = 1.5f;
+    public float yAscendMult = 1.5f;
 
     public enum falconStates
     {
@@ -44,9 +44,11 @@ public class UserInputFalcon : MonoBehaviour {
     }
     ascendingStates ascendState = ascendingStates.ascendingInit;
 
+    bool downKeyDown = false;
     bool downKeyPressed = false;
     bool downKeyReleased = false;
     float maxAscendingAngle = 0;
+    float yPosDiveStart = 0;
     Rigidbody2D rb;
 
     // Use this for initialization
@@ -59,9 +61,14 @@ public class UserInputFalcon : MonoBehaviour {
 	void Update ()
     {
         rb.AddForce(new Vector2(transform.right.x, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        downKeyDown = Input.GetKeyDown(keyForMovement);
         downKeyPressed = Input.GetKey(keyForMovement);
         downKeyReleased = Input.GetKeyUp(keyForMovement);
-        if (downKeyPressed)
+        if (downKeyDown)
+        {
+            yPosDiveStart = transform.position.y;
+        }
+        else if (downKeyPressed)
         {
             CurState = falconStates.diving;
         }
@@ -92,10 +99,6 @@ public class UserInputFalcon : MonoBehaviour {
         {
             rb.velocity = new Vector2(minSpeedX, rb.velocity.y);
         }
-        if (rb.velocity.y > maxSpeedY)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, maxSpeedY);
-        }
     }
 
     void DivingControl()
@@ -105,7 +108,8 @@ public class UserInputFalcon : MonoBehaviour {
 
     void ReleaseControl()
     {
-        maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
+        //maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
+        maxAscendingAngle = (yPosDiveStart - transform.position.y) * yAscendMult;
         rb.AddForce(new Vector2(0, rb.velocity.y * swoopYNegateMultiplier), ForceMode2D.Impulse);
         CurState = falconStates.ascending;
     }
