@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: RedtailAnim
+  m_Controller: {fileID: 9100000, guid: 50c945268fe6e544f8ff96bb6b0d5849, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 3cdc8dc09978c504d926a7c749d61ab4, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 9ee7476a04ad2854698821071604e4f9, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 84f8a23a4f3265246bdbe93f7b2e20e6, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: a6cd38d5cab10a944bbd396c4133adfd, type: 2}
