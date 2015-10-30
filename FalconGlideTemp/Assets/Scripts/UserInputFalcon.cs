@@ -15,7 +15,8 @@ public class UserInputFalcon : MonoBehaviour {
     public float minSpeedX = 5;
     public float maxSpeedY = 15;
     public float ascendInitVerticalMultiplier = 1.5f;
-    public float yAscendMult = -.8f;
+    public float ascendInitAngle = 30;
+    public float yAscendMult = -.6f;
     public float angleMult = 2f;
     //public float maxMagRatio = 1.1f;
 
@@ -73,7 +74,7 @@ public class UserInputFalcon : MonoBehaviour {
         {
             yPosDiveStart = transform.position.y;
         }
-        else if (downKeyPressed)
+        if (downKeyPressed)
         {
             CurState = falconStates.diving;
         }
@@ -119,6 +120,10 @@ public class UserInputFalcon : MonoBehaviour {
     {
         //maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
         maxAscendingAngle = (yPosDiveStart - transform.position.y) * angleMult;
+        if (maxAscendingAngle < ascendInitAngle)
+        {
+            maxAscendingAngle = ascendInitAngle;
+        }
         yOfMaxRise = yPosDiveStart + (yPosDiveStart - transform.position.y) * yAscendMult;
         //maxMagnitude = rb.velocity.magnitude / maxMagRatio;
         //rb.AddForce(new Vector2(0, rb.velocity.y * swoopNegateMultiplier), ForceMode2D.Impulse);
@@ -133,7 +138,7 @@ public class UserInputFalcon : MonoBehaviour {
         {
             case ascendingStates.ascendingInit:
                 rotationSpeed = initUpRotationSpeed;
-                angle = 0;
+                angle = ascendInitAngle;
                 rb.AddForce(new Vector2(0, ascendInitVerticalMultiplier * rb.velocity.y * -1));
                 break;
             case ascendingStates.ascending:
