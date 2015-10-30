@@ -7,14 +7,15 @@ public class UserInputFalcon : MonoBehaviour {
     public string keyForMovement = "down";
     public float maxAngle = 60;
     public float downRotationSpeed = 3;
-    public float upRotationSpeed = 1;
+    public float upRotationSpeed = 2;
     public float initUpRotationSpeed = 4;
     public float movementSpeed = 15;
-    public float swoopYNegateMultiplier = -.7f;
+    public float swoopYNegateMultiplier = 0;
     public float maxSpeedX = 20;
     public float minSpeedX = 5;
     public float ascendInitVerticalMultiplier = 1.5f;
-    public float yAscendMult = 1.5f;
+    public float yAscendMult = -.8f;
+    public float angleMult = 1.5f;
 
     public enum falconStates
     {
@@ -49,6 +50,8 @@ public class UserInputFalcon : MonoBehaviour {
     bool downKeyReleased = false;
     float maxAscendingAngle = 0;
     float yPosDiveStart = 0;
+    float yOfMaxRise = 0;
+    float maxMagnitude = 0;
     Rigidbody2D rb;
 
     // Use this for initialization
@@ -109,7 +112,9 @@ public class UserInputFalcon : MonoBehaviour {
     void ReleaseControl()
     {
         //maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
-        maxAscendingAngle = (yPosDiveStart - transform.position.y) * yAscendMult;
+        maxAscendingAngle = (yPosDiveStart - transform.position.y) * angleMult;
+        yOfMaxRise = yPosDiveStart + (yPosDiveStart - transform.position.y) * yAscendMult;
+        maxMagnitude = rb.velocity.magnitude / 1.3f;
         rb.AddForce(new Vector2(0, rb.velocity.y * swoopYNegateMultiplier), ForceMode2D.Impulse);
         CurState = falconStates.ascending;
     }
@@ -135,10 +140,16 @@ public class UserInputFalcon : MonoBehaviour {
         {
             ascendState = ascendingStates.ascending;
         }
+        if (rb.velocity.magnitude >= maxMagnitude && ascendState == ascendingStates.ascending)//transform.position.y > yOfMaxRise)
+        {
+            CurState = falconStates.gliding;
+        }
+        /*
         if (Mathf.Abs(transform.rotation.eulerAngles.z - maxAscendingAngle) < 5)
         {
             CurState = falconStates.gliding;
         }
+        */
     }
 
     void GlidingControl()
