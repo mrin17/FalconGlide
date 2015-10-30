@@ -13,10 +13,10 @@ public class UserInputFalcon : MonoBehaviour {
     //public float swoopYNegateMultiplier = 0;
     public float maxSpeedX = 20;
     public float minSpeedX = 5;
-    public float maxSpeedY = 15;
-    public float ascendInitVerticalMultiplier = 1.5f;
+    public float maxSpeedY = 10;
+    public float ascendInitVerticalMultiplier = 2;
     public float ascendInitAngle = 30;
-    public float yAscendMult = -.6f;
+    public float yAscendMult = -1f;
     public float angleMult = 2f;
     //public float maxMagRatio = 1.1f;
 
