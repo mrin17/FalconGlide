@@ -102,14 +102,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: -4
   keyForMovement: down
-  maxAngle: 45
+  maxAngle: 60
   downRotationSpeed: 3
-  upRotationSpeed: 1
+  upRotationSpeed: 2
   initUpRotationSpeed: 4
-  movementSpeed: 10
-  swoopYNegateMultiplier: -.800000012
+  movementSpeed: 15
   maxSpeedX: 20
   minSpeedX: 5
+  maxSpeedY: 10
+  ascendInitVerticalMultiplier: 4
+  ascendInitAngle: 30
+  yAscendMult: -1
+  angleMult: 2
 --- !u!61 &63788668 stripped
 BoxCollider2D:
   m_PrefabParentObject: {fileID: 6195700, guid: 412624b468c4f5d4895f91f967b80e10,
