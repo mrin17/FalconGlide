@@ -5,14 +5,16 @@ public class UserInputFalcon : MonoBehaviour {
 
     public float gravity = -4;
     public string keyForMovement = "down";
-    public float maxAngle = 45;
+    public float maxAngle = 60;
     public float downRotationSpeed = 1;
-    public float upRotationSpeed = 1;
+    public float upRotationSpeed = .7f;
     public float initUpRotationSpeed = 4;
-    public float movementSpeed = 5;
-    public float swoopYNegateMultiplier = -.9f;
+    public float movementSpeed = 10;
+    public float swoopYNegateMultiplier = -.5f;
     public float maxSpeedX = 20;
     public float minSpeedX = 5;
+    public float maxSpeedY = 15;
+    public float ascendInitVerticalMultiplier = 3;
 
     public enum falconStates
     {
@@ -90,6 +92,10 @@ public class UserInputFalcon : MonoBehaviour {
         {
             rb.velocity = new Vector2(minSpeedX, rb.velocity.y);
         }
+        if (rb.velocity.y > maxSpeedY)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, maxSpeedY);
+        }
     }
 
     void DivingControl()
@@ -113,6 +119,7 @@ public class UserInputFalcon : MonoBehaviour {
             case ascendingStates.ascendingInit:
                 rotationSpeed = initUpRotationSpeed;
                 angle = 0;
+                rb.AddForce(new Vector2(0, ascendInitVerticalMultiplier * rb.velocity.y * -1));
                 break;
             case ascendingStates.ascending:
                 rotationSpeed = upRotationSpeed;
@@ -120,15 +127,14 @@ public class UserInputFalcon : MonoBehaviour {
                 break;
         }
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, angle), Time.deltaTime * rotationSpeed);
-        if (Mathf.Abs(transform.rotation.eulerAngles.z) < 2)
+        if (transform.rotation.eulerAngles.z < 5 || 360 - transform.rotation.eulerAngles.z < 5)
         {
             ascendState = ascendingStates.ascending;
         }
-        if (Mathf.Abs(transform.rotation.eulerAngles.z - maxAscendingAngle) < 2)
+        if (Mathf.Abs(transform.rotation.eulerAngles.z - maxAscendingAngle) < 5)
         {
             CurState = falconStates.gliding;
         }
-
     }
 
     void GlidingControl()
