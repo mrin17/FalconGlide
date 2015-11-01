@@ -275,7 +275,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1232508556}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.6000004, y: 4.07000017, z: 0}
+  m_LocalPosition: {x: -10.6000004, y: 4.07000017, z: -1}
   m_LocalScale: {x: .342450798, y: .336473256, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -291,11 +291,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2c146fee89815e44815d68d4fe01666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diveTransitionConstant: 1
-  diveTransitionYHeightConstant: 0
-  diveDownTransitionTime: 2
-  diveToBoostTransitionTime: 2
-  boostYHeightConstant: 5
-  boostXShiftConstant: 5
-  boostEnergyMultiplier: 3
-  boostYSteepness: 3
+  diveToBoostTransitionTime: 1
+  boostEnergyMultiplier: 2

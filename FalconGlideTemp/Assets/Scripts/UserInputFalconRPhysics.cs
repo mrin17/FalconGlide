@@ -3,26 +3,22 @@ using System.Collections;
 
 public class UserInputFalconRPhysics : MonoBehaviour {
 
-    public float diveTransitionConstant;
-    public float diveTransitionYHeightConstant;
-    public float diveDownTransitionTime;
-    public float diveToBoostTransitionTime;
-    public float boostYHeightConstant;
-    public float boostXShiftConstant;
-    public float boostEnergyMultiplier;
-    public float boostYSteepness;
-    public float boostMultiplier;
+    public float diveToBoostTransitionTime; //How quickly we want the transition from DIVE - BOOST
+    public float boostEnergyMultiplier;     //Affects amount of energy gained from diving
 
-    falconStates currentState;
-    float timeHeld;
-    float timeGlide;
-    float timeBoost;
-    float timeDiveToBoostTransition;
-    float boostEnergy;
-    float boostEnergyTime;
-    float boostAirTime;
-    bool diveToBoostTransitionDone = false;
-    Vector2 tempVect = new Vector2(1, -1);
+    falconStates currentState; //Current state falcon is in
+    float timeDive;  //Running Counter for time in DIVE
+    float timeGlide; //Running Counter for time in GLIDE
+    float timeBoost; //Running Counter for time in BOOST
+    float boostEnergy; //Energy consumed during boost, gained on dive
+    bool diveToBoostTransitionDone = false; //Whether DIVE-BOOST transition is complete
+    float currentXVelocity; //Current X movememt to translate
+    float currentYVelocity; //Current Y movement to translate
+    float lastGlideYVelocity; //Storage of last velocity in GLIDE
+    float lastDiveYVelocity;  //Storage of last velocity in DIVE
+    float lastBoostYVelocity; //Storage of last velocity in BOOST
+    float lastBoostTransitionYVelocity; //Storage of last velocity in DIVE-BOOST transition
+    Vector2 movementVect; //Vector for translating falcon
     
     public enum falconStates
     {
@@ -31,47 +27,44 @@ public class UserInputFalconRPhysics : MonoBehaviour {
         diving,
     }
 
-	// Use this for initialization
-	void Start () {
+    /******************************
+    /*****EQUATIONS FOR STATES*****
+    ******************************/
+
+    float sinRiseEquation(float timeBoosting)
+    {
+        return Mathf.Sin(Mathf.PI / lastBoostTransitionYVelocity * timeBoosting);
+    }
+
+    float glidingEquation(float timeGliding)
+    {
+        return .5f * timeGlide + lastBoostYVelocity;
+    }
+
+    float diveTransitionEquation(float timeBoosting)
+    {
+        return (lastDiveYVelocity / (-diveToBoostTransitionTime)) * timeBoost + lastDiveYVelocity;
+    }
+
+    float divingEquation(float timeDiving)
+    {
+        return timeDiving + lastGlideYVelocity;
+    }
+
+    /********************************************
+    *****************END EQUATIONS***************
+    ********************************************/
+
+    void Start ()
+    {
         currentState = falconStates.gliding;
-	}
-
-    // y = 3(x^2) + 4
-    float expDiveEquation(float timeDiveHeld)
-    {
-        return diveTransitionConstant * Mathf.Pow(timeDiveHeld, 2) + diveTransitionYHeightConstant;
-    }
-
-    // f'(x) = n * 2x
-    float expDiveDerivative(float timeDiveHeld)
-    {
-        return diveTransitionConstant * 2 * timeDiveHeld;
-    }
-
-    float boostEquation(float timeBoosting)
-    {
-        float secondXIntercept = (boostYSteepness * boostAirTime * 2) / Mathf.Pow(boostAirTime, 2);
-        Debug.Log("SecondX: " + secondXIntercept);
-        return (-Mathf.Pow((secondXIntercept * timeBoosting - boostYSteepness), 2) + Mathf.Pow(boostYSteepness, 2)) * boostMultiplier * (1/secondXIntercept);
-    }
-
-    float linearDiveEquation (float timeDiveHeld)
-    {
-        float slope = expDiveDerivative(diveDownTransitionTime);
-        float yIntercept = expDiveEquation(diveDownTransitionTime);
-        return slope * (timeDiveHeld - diveDownTransitionTime) + yIntercept;
-    }
-
-    //     1
-    //-----------
-    // 1 + e^(-x)
-    float sigmoidBoostEquation (float timeBoosting)
-    {
-        return boostYHeightConstant / (1 + Mathf.Exp(-timeBoosting + boostXShiftConstant));
+        currentYVelocity = 0;
+        movementVect = new Vector2(1, -1);
     }
 	
-	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
+        //States based on key-presses
         if (Input.GetKeyDown(KeyCode.D))
         {
             currentState = falconStates.diving;
@@ -82,20 +75,22 @@ public class UserInputFalconRPhysics : MonoBehaviour {
         }
 
 
+        /***********GLIDE STATE****************/
         if (currentState == falconStates.gliding)
-        {
-            float tempY = 0;
+        {      
             timeGlide += Time.deltaTime;
+            currentYVelocity = glidingEquation(timeGlide);
+            lastGlideYVelocity = currentYVelocity;
 
-            //tempY = .1f * Mathf.Pow(timeGlide, 2);
-            tempY = timeGlide;
+            timeDive = 0.0f; //Reset Dive Time
+            timeBoost = 0.0f; //Reset Boost Time
 
-            timeHeld = 0.0f;
-            tempVect = new Vector2(1, -tempY);
+            movementVect = new Vector2(1, -currentYVelocity);
         }
+
+        /************BOOST STATE**************/
         else if (currentState == falconStates.boosting)
         {
-            float tempY = 0;
             timeBoost += Time.deltaTime;
 
             //If no more boost energy, return to gliding
@@ -106,50 +101,44 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             //Transition from diving to boosting
             else if (timeBoost < diveToBoostTransitionTime && !diveToBoostTransitionDone)
             {
-                tempY = expDiveEquation(boostEnergyTime);
+                currentYVelocity = diveTransitionEquation(timeBoost);
             }
+            //Trigger for if the transition is complete
             else if (!diveToBoostTransitionDone)
             {
                 diveToBoostTransitionDone = true;
                 timeBoost = 0.0f;
-                boostAirTime = boostEnergy;
+                lastBoostTransitionYVelocity = boostEnergy;
             }
             //Boosting
             else
             {
-                //tempY = -sigmoidBoostEquation(timeBoost);
-                //tempY = -.1f * timeBoost;
-                tempY = -boostEquation(timeBoost);
-                Debug.Log(tempY);
+                currentYVelocity = -sinRiseEquation(timeBoost);
+                lastBoostYVelocity = currentYVelocity;
             }
-            boostEnergy -= Time.deltaTime;
-            boostEnergyTime -= Time.deltaTime;
-            timeHeld = 0.0f;
-            tempVect = new Vector2(1, -tempY);
+
+            boostEnergy -= Time.deltaTime; //Subtract from boost energy every second
+            timeDive = 0.0f;  //Reset dive time
+            timeGlide = 0.0f; //Reset glide time
+
+            movementVect = new Vector2(1, -currentYVelocity);
         }
+
+        /**************DIVE STATE**************/
         else if (currentState == falconStates.diving)
         {
-            float tempY = 0;
-            timeHeld += Time.deltaTime;
-            boostEnergy = boostEnergyMultiplier * timeHeld; //Convert time diving into boost power
-            boostEnergyTime = timeHeld;
-            timeGlide = 0.0f;
-            timeBoost = 0.0f;
-            diveToBoostTransitionDone = false;
+            timeDive += Time.deltaTime;
+            boostEnergy = boostEnergyMultiplier * timeDive; //Convert time diving into boost power
+            timeGlide = 0.0f; //Reset glide counter to 0
+            timeBoost = 0.0f; //Reset boost counter to 0
+            diveToBoostTransitionDone = false; //Reset transition toggle
 
-            //Initial Drop of Falcon
-            if (timeHeld < diveDownTransitionTime)
-            {
-                tempY = expDiveEquation(timeHeld);
-            }
-            //Linear dive
-            else
-            {
-                tempY = linearDiveEquation(timeHeld);
-            }
-            tempVect = new Vector2(1, -tempY);
+            currentYVelocity = divingEquation(timeDive);
+            lastDiveYVelocity = currentYVelocity;
+
+            movementVect = new Vector2(1, -currentYVelocity);
         }
 
-        transform.Translate(tempVect * Time.deltaTime, Space.World);
+        transform.Translate(movementVect * Time.deltaTime, Space.World);
 	}
 }
