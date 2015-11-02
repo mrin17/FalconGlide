@@ -296,11 +296,12 @@ MonoBehaviour:
   diveYSteepness: 4
   diveXSteepness: 5
   glideSteepness: .699999988
-  boostYSteepness: 2
+  boostYSteepness: 1
   boostXSteepness: 100
   minXSpeed: 1
   glideSpeed: 100
-  boostXScale: 10
+  boostXScale: 4
+  transitionFactor: 5
   movementVect: {x: 0, y: 0}
 --- !u!114 &1232508560
 MonoBehaviour:
