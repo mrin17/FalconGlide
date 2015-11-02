@@ -291,5 +291,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2c146fee89815e44815d68d4fe01666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diveToBoostTransitionTime: 1
+  diveToBoostTransitionTime: .5
   boostEnergyMultiplier: 2
+  diveSteepness: 2
+  glideSteepness: .25
+  boostSteepness: 1
+  minXSpeed: 1
