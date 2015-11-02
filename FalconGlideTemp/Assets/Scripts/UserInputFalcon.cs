@@ -4,6 +4,7 @@ using System.Collections;
 public class UserInputFalcon : MonoBehaviour {
 
     public float gravity = -4;
+    //public float xDrag = -.2f; //we might want to add this later
     public string keyForMovement = "down";
     public float maxAngle = 60;
     public float downRotationSpeed = 3;
@@ -19,6 +20,7 @@ public class UserInputFalcon : MonoBehaviour {
     public float yAscendMult = -.5f;
     public float angleMult = 2f;
     public float timeInInitAscend = .5f;
+    public float releaseBoostMultiplier = 10f;
     //public float maxMagRatio = 1.1f;
 
     public enum falconStates
@@ -119,7 +121,7 @@ public class UserInputFalcon : MonoBehaviour {
     //slerp the angle downwards, and add force to your transform.right
     void DivingControl()
     {
-        rb.AddForce(new Vector2(transform.right.x, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, -maxAngle), Time.deltaTime * downRotationSpeed);
     }
 
@@ -127,7 +129,8 @@ public class UserInputFalcon : MonoBehaviour {
     void ReleaseControl()
     {
         //maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
-        rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        rb.AddForce(new Vector2(-transform.right.y, 0) * movementSpeed * releaseBoostMultiplier, ForceMode2D.Force);
+        //rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
         maxAscendingAngle = (yPosDiveStart - transform.position.y) * angleMult;
         if (maxAscendingAngle < ascendInitAngle)
         {
