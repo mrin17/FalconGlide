@@ -112,8 +112,9 @@ MonoBehaviour:
   maxSpeedY: 10
   ascendInitVerticalMultiplier: 4
   ascendInitAngle: 30
-  yAscendMult: -1
+  yAscendMult: -.5
   angleMult: 2
+  timeInInitAscend: .5
 --- !u!61 &63788668 stripped
 BoxCollider2D:
   m_PrefabParentObject: {fileID: 6195700, guid: 412624b468c4f5d4895f91f967b80e10,
