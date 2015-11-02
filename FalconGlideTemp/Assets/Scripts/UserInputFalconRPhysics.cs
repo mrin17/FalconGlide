@@ -3,7 +3,6 @@ using System.Collections;
 
 public class UserInputFalconRPhysics : MonoBehaviour {
 
-    public float diveToBoostTransitionTime; //How quickly we want the transition from DIVE - BOOST
     public float boostEnergyMultiplier;     //Affects amount of energy gained from diving
     public float diveYSteepness; //How sharp the falcon dives down
     public float diveXSteepness; //How slow the falcon gets while diving
@@ -12,14 +11,18 @@ public class UserInputFalconRPhysics : MonoBehaviour {
     public float boostXSteepness; //Rate at which horizantal speed is gained from boost
     public float minXSpeed; //Minimum horizantal speed that the falcon will travel
     public float glideSpeed; //How fast falcon will fly horizantal while gliding
-    public float initialBoostX; //Initial starting speed of boost
+    public float boostXScale; //Scales effectiveness of boost x
+    public float transitionFactor; //What portion of boost should transition be
 
     falconStates currentState; //Current state falcon is in
+    falconStates previousState; //Previous state falcon was in
     float timeDive;  //Running Counter for time in DIVE
     float timeGlide; //Running Counter for time in GLIDE
     float timeBoost; //Running Counter for time in BOOST
+    float timeTransition; //Running Counter for time in TRANSITION
     float boostEnergy; //Energy consumed during boost, gained on dive
     float boostEnergyTotal; //Total energy amassed during a dive
+    float initialBoostX; //Initial starting speed of boost
     bool diveToBoostTransitionDone = false; //Whether DIVE-BOOST transition is complete
     float currentXVelocity; //Current X movememt to translate
     float currentYVelocity; //Current Y movement to translate
@@ -33,6 +36,7 @@ public class UserInputFalconRPhysics : MonoBehaviour {
     float lastTransitionYVelocity; //Storage of last Y-velocity in DIVE-BOOST
     float boostYEnergyAfterTransition; //Storage of last Y-velocity in DIVE-BOOST transition
     float boostXEnergyAfterTransition; //Storage of last X-velocity in DIVE-BOOST transition
+    float diveToBoostTransitionTime; //How quickly we want the transition from DIVE - BOOST
     public Vector2 movementVect; //Vector for translating falcon
     
     public enum falconStates
@@ -40,6 +44,7 @@ public class UserInputFalconRPhysics : MonoBehaviour {
         gliding,
         boosting,
         diving,
+        transition
     }
 
     /******************************
@@ -53,9 +58,15 @@ public class UserInputFalconRPhysics : MonoBehaviour {
 
     float sinRiseXEquation(float timeBoosting)
     {
+        if (lastTransitionXVelocity < .00001f) lastTransitionXVelocity = .00001f;
         float h = Mathf.Log((-Mathf.Exp(-boostXEnergyAfterTransition) + 1) / lastTransitionXVelocity - .00001f);
         float k = lastTransitionXVelocity - Mathf.Exp(-h);
-        return Mathf.Exp((1/boostXSteepness) * -timeBoosting - h) + k + minXSpeed;
+        float result = Mathf.Exp((1 / boostXSteepness) * -timeBoosting - h) + k;
+        if (result < minXSpeed)
+        {
+            result = minXSpeed;
+        }
+        return result;
     }
 
     float glidingYEquation(float timeGliding)
@@ -65,7 +76,14 @@ public class UserInputFalconRPhysics : MonoBehaviour {
 
     float glidingXEquation(float timeGliding)
     {
-        return glideSpeed + minXSpeed;
+        float h = Mathf.Log((-Mathf.Exp(-999999999) + 1) / lastBoostXVelocity - .00001f);
+        float k = lastBoostXVelocity - Mathf.Exp(-h);
+        float result = Mathf.Exp((1 / glideSpeed) * -timeGliding - h) + k;
+        if (result < minXSpeed)
+        {
+            result = minXSpeed;
+        }
+        return result;
     }
 
     float diveTransitionYEquation(float timeBoosting)
@@ -80,12 +98,36 @@ public class UserInputFalconRPhysics : MonoBehaviour {
 
     float divingYEquation(float timeDiving)
     {
-        return (diveYSteepness * timeDiving) + lastGlideYVelocity;
+        if (previousState == falconStates.gliding)
+        { 
+            return (diveYSteepness * timeDiving) + lastGlideYVelocity;
+        }
+        else if (previousState == falconStates.boosting)
+        {
+            return (2 * diveYSteepness * timeDiving) + lastBoostYVelocity;
+        }
+        else
+        {
+            return (diveYSteepness * timeDiving) + lastTransitionYVelocity;
+        }
     }
 
     float divingXEquation(float timeDiving)
     {
-        float result = (diveXSteepness * -Mathf.Pow(timeDiving, 2)) + lastGlideXVelocity;
+        float result;
+        if (previousState == falconStates.gliding)
+        {
+            result = (diveXSteepness * -timeDiving) + lastGlideXVelocity;
+        }
+        else if (previousState == falconStates.boosting)
+        {
+            result = (diveXSteepness * -timeDiving) + lastBoostXVelocity;
+        }
+        else
+        {
+            result = (diveXSteepness * -timeDiving) + lastTransitionXVelocity;
+        }
+
         if (result < minXSpeed)
         {
             result = minXSpeed;
@@ -111,11 +153,26 @@ public class UserInputFalconRPhysics : MonoBehaviour {
         //States based on key-presses
         if (Input.GetKeyDown(KeyCode.D))
         {
+            if (currentState == falconStates.gliding)
+            {
+                previousState = falconStates.gliding;
+            }
+            else if (currentState == falconStates.boosting)
+            {
+                previousState = falconStates.boosting;
+            }
+            else if (currentState == falconStates.transition)
+            {
+                previousState = falconStates.transition;
+            }
             currentState = falconStates.diving;
         }
         else if (Input.GetKeyUp(KeyCode.D))
         {
-            currentState = falconStates.boosting;
+            if (currentState == falconStates.diving)
+            {
+                currentState = falconStates.transition;
+            }
         }
 
 
@@ -134,6 +191,30 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             movementVect = new Vector2(currentXVelocity, -currentYVelocity);
         }
 
+        /***********TRANSITION STATE****************/
+        else if (currentState == falconStates.transition)
+        {
+            timeTransition += Time.deltaTime;
+
+            //If transition over, return to boost
+            if (timeTransition >= diveToBoostTransitionTime)
+            {
+                currentState = falconStates.boosting;
+                boostYEnergyAfterTransition = boostEnergy;
+                boostXEnergyAfterTransition = boostEnergy;
+                timeBoost = 0.0f;
+            }
+
+            currentYVelocity = diveTransitionYEquation(timeTransition);
+            currentXVelocity = diveTransitionXEquation(timeTransition);
+            lastTransitionXVelocity = currentXVelocity;
+            lastTransitionYVelocity = currentYVelocity;
+            boostEnergy -= Time.deltaTime;
+
+            movementVect = new Vector2(currentXVelocity, -currentYVelocity);
+        }
+
+
         /************BOOST STATE**************/
         else if (currentState == falconStates.boosting)
         {
@@ -143,22 +224,6 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             if (boostEnergy <= 0)
             {
                 currentState = falconStates.gliding;
-            }
-            //Transition from diving to boosting
-            else if (timeBoost < diveToBoostTransitionTime && !diveToBoostTransitionDone)
-            {
-                currentYVelocity = diveTransitionYEquation(timeBoost);
-                currentXVelocity = diveTransitionXEquation(timeBoost);
-                lastTransitionXVelocity = currentXVelocity;
-                lastTransitionYVelocity = currentYVelocity;
-            }
-            //Trigger for if the transition is complete
-            else if (!diveToBoostTransitionDone)
-            {
-                diveToBoostTransitionDone = true;
-                timeBoost = 0.0f;
-                boostYEnergyAfterTransition = boostEnergy;
-                boostXEnergyAfterTransition = boostEnergy;
             }
             //Boosting
             else
@@ -172,6 +237,7 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             boostEnergy -= Time.deltaTime; //Subtract from boost energy every second
             timeDive = 0.0f;  //Reset dive time
             timeGlide = 0.0f; //Reset glide time
+            timeTransition = 0.0f; //Reset transition time
 
             movementVect = new Vector2(currentXVelocity, -currentYVelocity);
         }
@@ -182,9 +248,12 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             timeDive += Time.deltaTime;
             boostEnergy = boostEnergyMultiplier * timeDive; //Convert time diving into boost power
             boostEnergyTotal = boostEnergy; //Stores the maximum boost energy gained from dive
+            initialBoostX = timeDive * boostXScale;
             timeGlide = 0.0f; //Reset glide counter to 0
             timeBoost = 0.0f; //Reset boost counter to 0
+            timeTransition = 0.0f; //Reset transition counter to 0
             diveToBoostTransitionDone = false; //Reset transition toggle
+            diveToBoostTransitionTime = boostEnergyTotal / transitionFactor; //What portion of the boost should be transition
 
             currentYVelocity = divingYEquation(timeDive);
             currentXVelocity = divingXEquation(timeDive);
@@ -194,6 +263,8 @@ public class UserInputFalconRPhysics : MonoBehaviour {
             movementVect = new Vector2(currentXVelocity, -currentYVelocity);
         }
 
+        Debug.Log(movementVect);
+        Debug.Log(currentState);
         transform.Translate(movementVect * Time.deltaTime, Space.World);
 	}
 }

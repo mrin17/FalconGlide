@@ -235,6 +235,7 @@ GameObject:
   - 4: {fileID: 1232508558}
   - 212: {fileID: 1232508557}
   - 114: {fileID: 1232508559}
+  - 114: {fileID: 1232508560}
   m_Layer: 0
   m_Name: falconOpen
   m_TagString: Untagged
@@ -291,9 +292,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2c146fee89815e44815d68d4fe01666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diveToBoostTransitionTime: .5
   boostEnergyMultiplier: 2
-  diveSteepness: 2
-  glideSteepness: .25
-  boostSteepness: 1
+  diveYSteepness: 4
+  diveXSteepness: 5
+  glideSteepness: .699999988
+  boostYSteepness: 2
+  boostXSteepness: 100
   minXSpeed: 1
+  glideSpeed: 100
+  boostXScale: 10
+  movementVect: {x: 0, y: 0}
+--- !u!114 &1232508560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1232508556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d55d7ae68d7916b4198c2c9ffefb1a23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
