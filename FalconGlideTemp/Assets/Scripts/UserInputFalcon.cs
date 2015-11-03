@@ -20,7 +20,7 @@ public class UserInputFalcon : MonoBehaviour {
     public float ascendAngleMax = 60;
     public float yAscendMult = -.5f;
     public float angleMult = 2f;
-    public float timeInInitAscend = .5f;
+    public float timeInInitAscend = .3f;
     public float releaseBoostMultiplier = 10f;
     //public float maxMagRatio = 1.1f;
 
@@ -71,7 +71,9 @@ public class UserInputFalcon : MonoBehaviour {
     bool downKeyReleased = false;
     float ascendAngle = 0;
     float yPosDiveStart = 0;
+    float yPosDiveEnd = 0;
     float yOfMaxRise = 0;
+    GameObject debugLine;
     //float maxMagnitude = 0;
     Rigidbody2D rb;
 
@@ -80,6 +82,7 @@ public class UserInputFalcon : MonoBehaviour {
     {
         rb = GetComponent<Rigidbody2D>();
         rb.AddForce(new Vector2(10, 0));
+        debugLine = (GameObject)Instantiate(Resources.Load("preDebugLine"), new Vector3(-1000, -1000, 0), Quaternion.identity);
 	}
 	
 	// Update is called once per frame
@@ -93,6 +96,7 @@ public class UserInputFalcon : MonoBehaviour {
         if (downKeyDown)
         {
             yPosDiveStart = transform.position.y;
+            DisplayDebugLine();
         }
 	//if youre holding down, youre diving. If you released, you are in release
         if (downKeyPressed)
@@ -136,7 +140,8 @@ public class UserInputFalcon : MonoBehaviour {
     //slerp the angle downwards, and add force to your transform.right
     void DivingControl()
     {
-        rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        //rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        rb.AddForce(new Vector2(0, -2) * movementSpeed, ForceMode2D.Force);
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, -maxAngle), Time.deltaTime * downRotationSpeed);
     }
 
@@ -155,7 +160,8 @@ public class UserInputFalcon : MonoBehaviour {
         {
             ascendAngle = ascendAngleMax;
         }
-        yOfMaxRise = yPosDiveStart + (yPosDiveStart - transform.position.y) * yAscendMult;
+        yPosDiveEnd = transform.position.y;
+        yOfMaxRise = yPosDiveStart + (yPosDiveStart - yPosDiveEnd) * yAscendMult;
         //maxMagnitude = rb.velocity.magnitude / maxMagRatio;
         //rb.AddForce(new Vector2(0, rb.velocity.y * swoopNegateMultiplier), ForceMode2D.Impulse);
         CurState = falconStates.ascending;
@@ -165,7 +171,6 @@ public class UserInputFalcon : MonoBehaviour {
     //add force of your transform.right to ONLY your y, slerp the angle based on state in ascending, if you're higher than maxRise, go back to gliding
     void AscendingControl()
     {
-        rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
         float rotationSpeed = 0;
         float angle = 0;
         switch(ascendState)
@@ -173,24 +178,23 @@ public class UserInputFalcon : MonoBehaviour {
             case ascendingStates.ascendingInit:
                 rotationSpeed = initUpRotationSpeed;
                 angle = ascendInitAngle;
-                rb.AddForce(new Vector2(0, ascendInitVerticalMultiplier * rb.velocity.y * -1));
+                if (rb.velocity.y < 0)
+                   rb.AddForce(new Vector2(0, ascendInitVerticalMultiplier * rb.velocity.y * -1));
                 break;
             case ascendingStates.ascending:
                 rotationSpeed = upRotationSpeed;
                 angle = ascendAngle;
+                float yVelRatio = (yPosDiveStart - transform.position.y) / 2;
+                //(yPosDiveStart - transform.position.y) / (yPosDiveStart - yPosDiveEnd);
+                //rb.AddForce(new Vector2(0, yVelRatio) * movementSpeed, ForceMode2D.Force);
+                rb.velocity = new Vector2(rb.velocity.x, yVelRatio);
                 break;
         }
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, angle), Time.deltaTime * rotationSpeed);
-        if (transform.position.y > yOfMaxRise)//rb.velocity.magnitude >= maxMagnitude && ascendState == ascendingStates.ascending)//transform.position.y > yOfMaxRise)
+        if (transform.position.y > yOfMaxRise)
         {
             CurState = falconStates.gliding;
         }
-        /*
-        if (Mathf.Abs(transform.rotation.eulerAngles.z - ascendAngle) < 5)
-        {
-            CurState = falconStates.gliding;
-        }
-        */
     }
 
     //constantly apply gravity and slerp to 0 rotation
@@ -206,6 +210,11 @@ public class UserInputFalcon : MonoBehaviour {
     {
         yield return new WaitForSeconds(timeInInitAscend);
         ascendState = ascendingStates.ascending;
+    }
+
+    void DisplayDebugLine()
+    {
+        debugLine.transform.position = transform.position;
     }
 
 }

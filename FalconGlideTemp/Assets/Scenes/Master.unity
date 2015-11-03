@@ -109,12 +109,14 @@ MonoBehaviour:
   movementSpeed: 15
   maxSpeedX: 20
   minSpeedX: 5
-  maxSpeedY: 10
-  ascendInitVerticalMultiplier: 4
+  maxSpeedY: 100
+  ascendInitVerticalMultiplier: 6
   ascendInitAngle: 30
-  yAscendMult: -.5
+  ascendAngleMax: 60
+  yAscendMult: -.899999976
   angleMult: 2
-  timeInInitAscend: .5
+  timeInInitAscend: .400000006
+  releaseBoostMultiplier: 10
 --- !u!61 &63788668 stripped
 BoxCollider2D:
   m_PrefabParentObject: {fileID: 6195700, guid: 412624b468c4f5d4895f91f967b80e10,
@@ -937,7 +939,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 469134, guid: 412624b468c4f5d4895f91f967b80e10, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -39.7999992
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 469134, guid: 412624b468c4f5d4895f91f967b80e10, type: 2}
       propertyPath: m_LocalPosition.z
