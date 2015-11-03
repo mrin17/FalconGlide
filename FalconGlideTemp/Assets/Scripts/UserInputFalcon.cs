@@ -17,12 +17,27 @@ public class UserInputFalcon : MonoBehaviour {
     public float maxSpeedY = 10;
     public float ascendInitVerticalMultiplier = 4f;
     public float ascendInitAngle = 30;
+    public float ascendAngleMax = 60;
     public float yAscendMult = -.5f;
     public float angleMult = 2f;
     public float timeInInitAscend = .5f;
     public float releaseBoostMultiplier = 10f;
     //public float maxMagRatio = 1.1f;
 
+
+    //MODES:
+    //-rapidly tapping 'down' should only very marginally increase your x speed
+    //-small swoops and large swoops have the same/a similar effect on your x velocity and y position in the end
+
+    //FALCON STATES:
+    //GLIDE - constant gravity
+    //DIVE - x speed slows, y speed increases downward
+    //ASCEND INIT - x boost based on dive time, 
+    //y boost decays to 0
+    //ASCEND - length based on dive speed, 
+    //y increases upwards (y force decays over time), 
+    //x speed decreases over time but larger than pre dive speed
+    //at the end of the boost you are slightly lower than you started
     public enum falconStates
     {
         diving, 
@@ -54,7 +69,7 @@ public class UserInputFalcon : MonoBehaviour {
     bool downKeyDown = false;
     bool downKeyPressed = false;
     bool downKeyReleased = false;
-    float maxAscendingAngle = 0;
+    float ascendAngle = 0;
     float yPosDiveStart = 0;
     float yOfMaxRise = 0;
     //float maxMagnitude = 0;
@@ -128,13 +143,17 @@ public class UserInputFalcon : MonoBehaviour {
     //track the max ascending angle, track the y position at which you should stop ascending, start the ascend init timer
     void ReleaseControl()
     {
-        //maxAscendingAngle = (360 - transform.rotation.eulerAngles.z);
+        //ascendAngle = (360 - transform.rotation.eulerAngles.z);
         rb.AddForce(new Vector2(-transform.right.y, 0) * movementSpeed * releaseBoostMultiplier, ForceMode2D.Force);
         //rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
-        maxAscendingAngle = (yPosDiveStart - transform.position.y) * angleMult;
-        if (maxAscendingAngle < ascendInitAngle)
+        ascendAngle = (yPosDiveStart - transform.position.y) * angleMult;
+        if (ascendAngle < ascendInitAngle)
         {
-            maxAscendingAngle = ascendInitAngle;
+            ascendAngle = ascendInitAngle;
+        }
+        if (ascendAngle > ascendAngleMax)
+        {
+            ascendAngle = ascendAngleMax;
         }
         yOfMaxRise = yPosDiveStart + (yPosDiveStart - transform.position.y) * yAscendMult;
         //maxMagnitude = rb.velocity.magnitude / maxMagRatio;
@@ -158,7 +177,7 @@ public class UserInputFalcon : MonoBehaviour {
                 break;
             case ascendingStates.ascending:
                 rotationSpeed = upRotationSpeed;
-                angle = maxAscendingAngle;
+                angle = ascendAngle;
                 break;
         }
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, angle), Time.deltaTime * rotationSpeed);
@@ -167,7 +186,7 @@ public class UserInputFalcon : MonoBehaviour {
             CurState = falconStates.gliding;
         }
         /*
-        if (Mathf.Abs(transform.rotation.eulerAngles.z - maxAscendingAngle) < 5)
+        if (Mathf.Abs(transform.rotation.eulerAngles.z - ascendAngle) < 5)
         {
             CurState = falconStates.gliding;
         }
