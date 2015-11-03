@@ -101,6 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: -4
+  divingYVel: -2
   keyForMovement: down
   maxAngle: 60
   downRotationSpeed: 3
@@ -110,7 +111,7 @@ MonoBehaviour:
   maxSpeedX: 20
   minSpeedX: 5
   maxSpeedY: 100
-  ascendInitVerticalMultiplier: 6
+  ascendInitVerticalMultiplier: 4
   ascendInitAngle: 30
   ascendAngleMax: 60
   yAscendMult: -.899999976
