@@ -101,15 +101,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: -4
+  divingYVel: -2
+  xDrag: -.200000003
   keyForMovement: down
-  maxAngle: 45
+  maxAngle: 60
   downRotationSpeed: 3
-  upRotationSpeed: 1
+  upRotationSpeed: 2
   initUpRotationSpeed: 4
-  movementSpeed: 10
-  swoopYNegateMultiplier: -.800000012
+  movementSpeed: 15
   maxSpeedX: 20
   minSpeedX: 5
+  xSpeedDefault: 10
+  maxSpeedY: 100
+  ascendInitVerticalMultiplier: 4
+  ascendInitAngle: 30
+  ascendAngleMax: 60
+  yAscendMult: -.899999976
+  angleMult: 2
+  timeInInitAscend: .400000006
+  releaseBoostMultiplier: 1
 --- !u!61 &63788668 stripped
 BoxCollider2D:
   m_PrefabParentObject: {fileID: 6195700, guid: 412624b468c4f5d4895f91f967b80e10,
@@ -709,7 +719,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 469134, guid: 412624b468c4f5d4895f91f967b80e10, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -39.7999992
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 469134, guid: 412624b468c4f5d4895f91f967b80e10, type: 2}
       propertyPath: m_LocalPosition.z
