@@ -5,25 +5,24 @@ public class UserInputFalcon : MonoBehaviour {
 
     public float gravity = -4;
     public float divingYVel = -2;
-    //public float xDrag = -.2f; //we might want to add this later
+    public float xDrag = -.2f;
     public string keyForMovement = "down";
     public float maxAngle = 60;
     public float downRotationSpeed = 3;
     public float upRotationSpeed = 2;
     public float initUpRotationSpeed = 4;
     public float movementSpeed = 15;
-    //public float swoopYNegateMultiplier = 0;
     public float maxSpeedX = 20;
     public float minSpeedX = 5;
+    public float xSpeedDefault = 10;
     public float maxSpeedY = 100;
-    public float ascendInitVerticalMultiplier = 6f;
+    public float ascendInitVerticalMultiplier = 4f;
     public float ascendInitAngle = 30;
     public float ascendAngleMax = 60;
     public float yAscendMult = -.9f;
     public float angleMult = 2f;
     public float timeInInitAscend = .4f;
-    public float releaseBoostMultiplier = 10f;
-    //public float maxMagRatio = 1.1f;
+    public float releaseBoostMultiplier = 1f;
 
 
     //MODES:
@@ -82,14 +81,13 @@ public class UserInputFalcon : MonoBehaviour {
     void Start ()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.AddForce(new Vector2(10, 0));
+        rb.AddForce(new Vector2(xSpeedDefault, 0));
         debugLine = (GameObject)Instantiate(Resources.Load("preDebugLine"), new Vector3(-1000, -1000, 0), Quaternion.identity);
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        //rb.AddForce(new Vector2(transform.right.x, transform.right.y) * movementSpeed, ForceMode2D.Force);
         downKeyDown = Input.GetKeyDown(keyForMovement);
         downKeyPressed = Input.GetKey(keyForMovement);
         downKeyReleased = Input.GetKeyUp(keyForMovement);
@@ -132,6 +130,10 @@ public class UserInputFalcon : MonoBehaviour {
         {
             rb.velocity = new Vector2(minSpeedX, rb.velocity.y);
         }
+        if (rb.velocity.x > xSpeedDefault)
+        {
+            rb.AddForce(new Vector2(xDrag, 0));
+        }
         if (rb.velocity.y > maxSpeedY)
         {
             rb.velocity = new Vector2(rb.velocity.x, maxSpeedY);
@@ -141,17 +143,14 @@ public class UserInputFalcon : MonoBehaviour {
     //slerp the angle downwards, and add force to your transform.right
     void DivingControl()
     {
-        //rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
-        rb.AddForce(new Vector2(0, divingYVel) * movementSpeed, ForceMode2D.Force);
+        rb.AddForce(new Vector2(xDrag, divingYVel) * movementSpeed, ForceMode2D.Force);
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, -maxAngle), Time.deltaTime * downRotationSpeed);
     }
 
     //track the max ascending angle, track the y position at which you should stop ascending, start the ascend init timer
     void ReleaseControl()
     {
-        //ascendAngle = (360 - transform.rotation.eulerAngles.z);
-        rb.AddForce(new Vector2(-transform.right.y, 0) * movementSpeed * releaseBoostMultiplier, ForceMode2D.Force);
-        //rb.AddForce(new Vector2(0, transform.right.y) * movementSpeed, ForceMode2D.Force);
+        rb.AddForce(new Vector2(-rb.velocity.y, 0) * movementSpeed * releaseBoostMultiplier, ForceMode2D.Force);
         ascendAngle = (yPosDiveStart - transform.position.y) * angleMult;
         if (ascendAngle < ascendInitAngle)
         {
@@ -163,8 +162,6 @@ public class UserInputFalcon : MonoBehaviour {
         }
         yPosDiveEnd = transform.position.y;
         yOfMaxRise = yPosDiveStart + (yPosDiveStart - yPosDiveEnd) * yAscendMult;
-        //maxMagnitude = rb.velocity.magnitude / maxMagRatio;
-        //rb.AddForce(new Vector2(0, rb.velocity.y * swoopNegateMultiplier), ForceMode2D.Impulse);
         CurState = falconStates.ascending;
         StartCoroutine(initAscendTimer());
     }
@@ -187,10 +184,9 @@ public class UserInputFalcon : MonoBehaviour {
             case ascendingStates.ascending:
                 rotationSpeed = upRotationSpeed;
                 angle = ascendAngle;
-                //float yVelRatio = (yPosDiveStart - transform.position.y) / 2;
                 float yRatio = (yPosDiveStart - transform.position.y) / (yPosDiveStart - yPosDiveEnd);
+                yRatio = yRatio / 2;
                 rb.AddForce(new Vector2(0, yRatio) * movementSpeed, ForceMode2D.Force);
-                //rb.velocity = new Vector2(rb.velocity.x, yVelRatio);
                 break;
         }
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, angle), Time.deltaTime * rotationSpeed);
