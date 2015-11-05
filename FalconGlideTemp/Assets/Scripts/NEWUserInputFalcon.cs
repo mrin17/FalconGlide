@@ -3,6 +3,9 @@ using System.Collections;
 
 public class NEWUserInputFalcon : MonoBehaviour {
 
+    /// <summary>
+    /// the gravity added when gliding
+    /// </summary>
     public float gravity = -4;
     public float divingYVel = -2;
     public float xDrag = -.2f;
