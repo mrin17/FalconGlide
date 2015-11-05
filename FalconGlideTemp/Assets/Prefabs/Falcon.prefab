@@ -12,7 +12,7 @@ GameObject:
   - 50: {fileID: 5038978}
   - 212: {fileID: 21269576}
   - 95: {fileID: 9542938}
-  - 114: {fileID: 11439494}
+  - 114: {fileID: 11408804}
   m_Layer: 0
   m_Name: Falcon
   m_TagString: Untagged
@@ -78,7 +78,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11439494
+--- !u!114 &11408804
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -89,10 +89,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f8e1a41da1a6b409b64e27a8ac1414, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  otherFalconColliders: []
   gravity: -4
   divingYVel: -2
   xDrag: -.200000003
-  keyForMovement: a
+  keyForMovement: down
   movementSpeed: 15
   xSpeedDefault: 10
   ascendVelMult: 4.69999981
