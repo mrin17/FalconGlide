@@ -8,11 +8,11 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 469134}
-  - 114: {fileID: 11475694}
   - 61: {fileID: 6195700}
   - 50: {fileID: 5038978}
   - 212: {fileID: 21269576}
   - 95: {fileID: 9542938}
+  - 114: {fileID: 11408804}
   m_Layer: 0
   m_Name: Falcon
   m_TagString: Untagged
@@ -78,7 +78,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11475694
+--- !u!114 &11408804
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -86,15 +86,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 115050}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4dbccace169b4c49854c01ff969510a, type: 3}
+  m_Script: {fileID: 11500000, guid: 24f8e1a41da1a6b409b64e27a8ac1414, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSpeedX: 25
-  downButtonMultiplier: {x: 0, y: -5}
-  impulseMultiplier: {x: .0500000007, y: 1.29999995}
+  otherFalconColliders: []
+  gravity: -4
+  divingYVel: -2
+  xDrag: -.200000003
   keyForMovement: down
-  glidingMultiplier: 7
-  releaseDownTimerMax: .5
+  movementSpeed: 15
+  xSpeedDefault: 10
+  ascendVelMult: 4.69999981
 --- !u!212 &21269576
 SpriteRenderer:
   m_ObjectHideFlags: 1
